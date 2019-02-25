@@ -497,16 +497,62 @@ var tagCount = function(tag, node) {};
 // var array = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
 // binarySearch(array, 5) // 5
 // https://www.khanacademy.org/computing/computer-science/algorithms/binary-search/a/binary-search
-var binarySearch = function(array, target, min, max) {};
+var binarySearch = function(array, target, min = 0, max = array.length - 1) {
+  let mid = Math.floor((max + min) / 2);
+
+  if (array[mid] === target) return mid;
+  if (min > max) return null;
+  if (array[mid] > target) return binarySearch(array, target, min, mid - 1);
+  if (array[mid] < target) return binarySearch(array, target, mid + 1, max);
+};
 
 // 39. Write a merge sort function.
 // mergeSort([34,7,23,32,5,62]) // [5,7,23,32,34,62]
 // https://www.khanacademy.org/computing/computer-science/algorithms/merge-sort/a/divide-and-conquer-algorithms
-var mergeSort = function(array) {};
+
+const merge = (left, right) => {
+  let result = [];
+  let indexLeft = 0;
+  let indexRight = 0;
+  while (indexLeft < left.length && indexRight < right.length) {
+    if (left[indexLeft] < right[indexRight]) {
+      result.push(left[indexLeft]);
+      indexLeft++;
+    } else {
+      result.push(right[indexRight]);
+      indexRight++;
+    }
+  }
+  return result.concat(left.slice(indexLeft)).concat(right.slice(indexRight));
+};
+var mergeSort = function(array) {
+  const merge = (left, right) => {
+    let result = [];
+    let indexLeft = 0;
+    let indexRight = 0;
+    while (indexLeft < left.length && indexRight < right.length) {
+      if (left[indexLeft] < right[indexRight]) {
+        result.push(left[indexLeft]);
+        indexLeft++;
+      } else {
+        result.push(right[indexRight]);
+        indexRight++;
+      }
+    }
+    return result.concat(left.slice(indexLeft)).concat(right.slice(indexRight));
+  };
+
+  if (array.length <= 1) return array;
+  let mid = Math.floor(array.length / 2);
+  const left = array.slice(0, mid); // items on the left side
+  const right = array.slice(mid); // items on the right side
+  return merge(mergeSort(left), mergeSort(right));
+};
 
 // 40. Deeply clone objects and arrays.
 // var obj1 = {a:1,b:{bb:{bbb:2}},c:3};
 // var obj2 = clone(obj1);
 // console.log(obj2); // {a:1,b:{bb:{bbb:2}},c:3}
 // obj1 === obj2 // false
+
 var clone = function(input) {};
