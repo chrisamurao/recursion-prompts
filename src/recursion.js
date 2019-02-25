@@ -85,10 +85,8 @@ var range = function(x, y) {
 // https://www.khanacademy.org/computing/computer-science/algorithms/recursive-algorithms/a/computing-powers-of-a-number
 var exponent = function(base, exp) {
   if (exp === 0) return 1;
-  if (exp === 1) return base;
-  if (exp === -1) return 1 / base;
-  if (exp > 1) return base * exponent(base, exp - 1);
-  if (exp < -1) return (1 / base) * exponent(base, exp + 1); // floating point random errors in tests
+  if (exp >= 1) return base * exponent(base, exp - 1);
+  if (exp <= -1) return (1 / base) * exponent(base, exp + 1); // floating point random errors in tests
 };
 
 // 8. Determine if a number is a power of two.
@@ -220,13 +218,24 @@ var buildList = function(value, length) {
 // The problem lies in determining what the current number is with only the information n
 // 2/21/19
 
-var fizzBuzz = function(n) {
-  if (n === 1) return [1];
-  if (n % 3 === 0 && n % 5 === 0) return ["FizzBuzz"].concat(fizzBuzz(n - 1));
-  if (n % 3 === 0) return ["Fizz"].concat(fizzBuzz(n - 1));
-  if (n % 5 === 0) return ["Buzz"].concat(fizzBuzz(n - 1));
+// var fizzBuzz = function(n) {
+//   if (n === 1) return [1];
+//   if (n % 3 === 0 && n % 5 === 0) return ["FizzBuzz"].concat(fizzBuzz(n - 1));
+//   if (n % 3 === 0) return ["Fizz"].concat(fizzBuzz(n - 1));
+//   if (n % 5 === 0) return ["Buzz"].concat(fizzBuzz(n - 1));
 
-  return [n + ""].concat(fizzBuzz(n - 1));
+//   return [n + ""].concat(fizzBuzz(n - 1));
+// };
+
+// 2/24/19... A different way to look at this is to work from the other way
+// this works, no helper function
+var fizzBuzz = function(n) {
+  if (n === 0) return [];
+  let str = "";
+  if (n % 3 === 0) str += "Fizz";
+  if (n % 5 === 0) str += "Buzz";
+  if (n % 3 !== 0 && n % 5 !== 0) str += n;
+  return fizzBuzz(n - 1).concat([str]);
 };
 
 // 20. Count the occurence of a value in a list.
@@ -254,24 +263,60 @@ var rMap = function(array, callback) {
 // var obj = {'e':{'x':'y'},'t':{'r':{'e':'r'},'p':{'y':'r'}},'y':'e'};
 // countKeysInObj(obj, 'r') // 1
 // countKeysInObj(obj, 'e') // 2
-var countKeysInObj = function(obj, key) {};
+
+// i feel like it's somehow cheating using iterators, but idk how to otherwise oh well
+var countKeysInObj = function(obj, key) {
+  let count = 0;
+  for (let i in obj) {
+    if (key === i) count++;
+    if (typeof obj[i] === "object") count += countKeysInObj(obj[i], key);
+  }
+  return count;
+};
 
 // 23. Write a function that counts the number of times a value occurs in an object.
 // var obj = {'e':{'x':'y'},'t':{'r':{'e':'r'},'p':{'y':'r'}},'y':'e'};
 // countValuesInObj(obj, 'r') // 2
 // countValuesInObj(obj, 'e') // 1
-var countValuesInObj = function(obj, value) {};
+var countValuesInObj = function(obj, value) {
+  let count = 0;
+  for (let i in obj) {
+    if (value === obj[i]) count++;
+    if (typeof obj[i] === "object") count += countValuesInObj(obj[i], value);
+  }
+  return count;
+};
 
 // 24. Find all keys in an object (and nested objects) by a provided name and rename
 // them to a provided new name while preserving the value stored at that key.
-var replaceKeysInObj = function(obj, oldKey, newKey) {};
+// obj = {'foo':'g'}
+// replaceKeysInObj(obj, 'foo', 'baz') // {'baz':'g'}
+var replaceKeysInObj = function(obj, oldKey, newKey) {
+  for (let i in obj) {
+    if (typeof obj[i] === "object") replaceKeysInObj(obj[i], oldKey, newKey);
+    if (i === oldKey) {
+      obj[newKey] = obj[oldKey];
+      delete obj[oldKey];
+    }
+  }
+  return obj;
+};
 
 // 25. Get the first n Fibonacci numbers. In the Fibonacci sequence, each subsequent
 // number is the sum of the previous two.
 // Example: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34.....
 // fibonacci(5); // [0,1,1,2,3,5]
 // Note: The 0 is not counted.
-var fibonacci = function(n) {};
+
+//horribly slow btw
+var fibonacci = function(n) {
+  if (n <= 0) return null;
+  if (n === 1) return [0, 1];
+  let returnValue = fibonacci(n - 1);
+  let len = returnValue.length;
+  let fibNum = returnValue[len - 1] + returnValue[len - 2];
+  return fibonacci(n - 1).concat([fibNum]);
+};
 
 // 26. Return the Fibonacci number located at index n of the Fibonacci sequence.
 // [0,1,1,2,3,5,8,13,21]
